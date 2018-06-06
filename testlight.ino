@@ -89,19 +89,21 @@ void MotorDirection(int mode)
            digitalWrite(LM,HIGH);
            break;
     case 3: // turn left
-          digitalWrite(RE,HIGH);
-          digitalWrite(RM,LOW);
-          digitalWrite(LE,LOW);
-          break;
-    case 4: //turn right
           digitalWrite(RE,LOW);
           digitalWrite(LE,HIGH);
           digitalWrite(LM,LOW);
+          break;
+    case 4: //turn right
+          digitalWrite(RE,HIGH);
+          digitalWrite(RM,LOW);
+          digitalWrite(LE,LOW);
           break; 
   }
 }
 
-void ReadRGB(){ 
+void ReadRGB()
+{
+  //reset left and right warning flag 
   lwarning = false;
   rwarning = false;
   // Setting red filtered photodiodes to be read
@@ -153,12 +155,31 @@ void ReadRGB(){
   delay(100);
 
   //add condiation yellow and return 
-  if ((Lrgb[0] > 20) && (Lrgb[0] <53) && (Lrgb[1] > 60) && (Lrgb[1] < 92) && (Lrgb[2] > 80) && (Lrgb[2] <147)) 
+  if ((Lrgb[0] > 20) && (Lrgb[0] <83) && (Lrgb[1] > 60) && (Lrgb[1] < 92) && (Lrgb[2] > 80) && (Lrgb[2] <147)) 
     lwarning = true;
-  if ((Rrgb[0] > 20) && (Rrgb[0] <53) && (Rrgb[1] > 60) && (Rrgb[1] < 92) && (Rrgb[2] > 80) && (Rrgb[2] <147))
+  if ((Rrgb[0] > 20) && (Rrgb[0] <83) && (Rrgb[1] > 60) && (Rrgb[1] < 92) && (Rrgb[2] > 80) && (Rrgb[2] <147))
     rwarning = true;
 }
+void colorcheck()
+{
+  Serial.print("Left side=");
+  Serial.print(Lrgb[0]);
+  Serial.print("  ");
+  Serial.print(Lrgb[1]);
+  Serial.print("  ");
+  Serial.print(Lrgb[2]);
+  Serial.print("  ");
+  Serial.println(lwarning);
 
+  Serial.print("Right side=");
+  Serial.print(Rrgb[0]);
+  Serial.print("  ");
+  Serial.print(Rrgb[1]);
+  Serial.print("  ");
+  Serial.print(Rrgb[2]);
+  Serial.print("  ");
+  Serial.println(rwarning);
+}
 //--------main----------//
 void setup() 
 {
@@ -169,19 +190,12 @@ void setup()
 void loop() 
 {
   ReadRGB();
-//  Serial.print(Lrgb[0]);
-//  Serial.print("  ");
-//  Serial.print(Lrgb[1]);
-//  Serial.print("  ");
-//  Serial.print(Lrgb[2]);
-//  Serial.print("  ");
-//  Serial.println(lwarning);
-//  Serial.println(rwarning);
+//colorcheck(); //check color range
   if ((!rwarning) && (!lwarning)) // car foward
   {
     MotorDirection(1);
   }
-  else if ((rwarning) || (lwarning)) // don't care left or right out of lens
+  else if ((rwarning) || (lwarning)) // don't care left or right out of lane
   {
     MotorDirection(0);
     delay(500);
